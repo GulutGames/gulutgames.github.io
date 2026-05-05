@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+	<head>
+		<title>Minecraft Server</title>
+		<link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="assets/style.css">
+	</head>
+	<body>
+		<a href="index.html">
+			<img class="logo" src="assets/images/GulutGames_Logo_AI-3D_no_background.png" alt="Logo">
+		</a>
+		<!--<select class="langselect">
+			<option value="en_US">English</option>
+			<option value="de_DE">Deutsch</option>
+		</select>-->
+		<h1>lachs attack</h1>
+		<br>
+		<!--Minecraft Server Status-->
+		<img src="" alt="Server Icon" id="serverIcon" style="display: none" width="100px">
+	</body>
+	<script src="assets/main.js"></script>
+	<script>
+		fetch("https://api.mcsrvstat.us/3/lachsattack.mcsh.io")
+			.then(response => response.json())
+			.then(data => {
+				const serverStatus = document.createElement("p");
+				serverStatus.id = "serverStatus";
+				const playerCount = document.createElement("p");
+				playerCount.id = "playerCount";
+				const versionInfo = document.createElement("p");
+				versionInfo.id = "versionInfo";
+				const serverSoftware = document.createElement("p");
+				serverSoftware.id = "serverSoftware";
+				const serverPlugins = document.createElement("p");
+				serverPlugins.id = "serverPlugins";
+				const serverIcon = data.icon;
+				const imgElement = document.getElementById("serverIcon");
+
+				imgElement.src = serverIcon;
+				imgElement.style.display = "block";
+				playerCount.textContent = data.players ? `${data.players.online} von ${data.players.max} Spielern online` : "Keine Spielerinformationen verfügbar";
+				versionInfo.textContent = data.version ? `Version: ${data.version}` : "Keine Versionsinformationen verfügbar";
+				serverSoftware.textContent = data.software ? `Software: ${data.software}` : "Keine Softwareinformationen verfügbar";
+				if (data.software && (data.software.toLowerCase().includes("forge") || data.software.toLowerCase().includes("neoforge") || data.software.toLowerCase().includes("fabric") || data.software.toLowerCase().includes("quilt"))) {
+					serverPlugins.textContent = data.mods ? `Mods: ${data.mods.join(", ")}` : "Keine Mod-Informationen verfügbar";
+				} else {
+					serverPlugins.textContent = data.plugins ? `Plugins: ${data.plugins.join(", ")}` : "Keine Plugin-Informationen verfügbar";
+				}
+
+				document.body.appendChild(serverStatus);
+				if (data.version == "Offline" || data.version == "MCServerHost" || data.version == "Paused") {
+					serverStatus.textContent = "Der Minecraft Server ist pausiert. Tritt ihm bei, um ihn automatisch zu starten.";
+					console.log("Server Paused");
+				} else if (data.online) {
+					serverStatus.textContent = "Online";
+					serverStatus.classList.add("status-online");
+					console.log("Server Online");
+					document.body.appendChild(playerCount);
+					document.body.appendChild(versionInfo);
+					document.body.appendChild(serverSoftware);
+					document.body.appendChild(serverPlugins);
+				} else {
+					serverStatus.textContent = "Offline";
+					serverStatus.classList.add("status-offline");
+					console.log("Server Offline");
+					imgElement.src = "assets/images/mcserveroffline.png";
+				}
+			})
+			.catch(error => {
+				const errorMsg = document.createElement("p");
+				console.error("Failed to retrieve server status:", error);
+				errorMsg.textContent = "Fehler beim Abrufen des Serverstatus.";
+				document.body.appendChild(errorMsg);
+			});
+	</script>
+</html>
